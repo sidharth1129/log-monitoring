@@ -1,7 +1,20 @@
 #!/bin/bash
 
+# Check if a log file is provided as an argument
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <log_file>"
+    exit 1
+fi
+
+logfile="$1"
+
+# Check if the log file exists
+if [ ! -f "$logfile" ]; then
+    echo "Error: Log file '$logfile' not found."
+    exit 1
+fi
+
 # Define variables
-LOG_FILE="name_of_your_logfile.log" #give the name of the required log file.
 KEYWORDS=("error" "404" "500")
 LOG_DIR="logs"
 SUMMARY_FILE="${LOG_DIR}/summary.txt"
@@ -9,11 +22,13 @@ SUMMARY_FILE="${LOG_DIR}/summary.txt"
 # Create log directory if it doesn't exist
 mkdir -p "${LOG_DIR}"
 
-# Function to monitor log file
+# Function to monitor the log file for new entries
 monitor_log() {
-    echo "Monitoring log file: ${LOG_FILE}"
-    tail -f "${LOG_FILE}" | while read line; do
-        echo "$line"
+    echo "Monitoring $logfile for new entries..."
+
+    # Continuous monitoring using tail
+    tail -n 0 -f "$logfile" | while read line; do
+        echo "$line"  # Display new log entries in real time
         analyze_log "$line"
     done
 }
